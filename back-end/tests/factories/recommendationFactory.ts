@@ -1,9 +1,16 @@
 import { prisma } from "../../src/database"
 import { CreateRecommendationData } from "../../src/services/recommendationsService"
 
-export default function recommendationFactory(): CreateRecommendationData {
+export function recommendationValidBody(): CreateRecommendationData {
     return {
         name: "super vídeo mega ultra maneiro",
+        youtubeLink: "https://www.youtube.com/watch?v=Nqy5B8R40Pg"
+    }
+}
+
+export function recommendationInvalidBody() {
+    return {
+        name: {obj: "obj"},
         youtubeLink: "https://www.youtube.com/watch?v=Nqy5B8R40Pg"
     }
 }

@@ -1,7 +1,7 @@
 import app from "../../src/app";
 import supertest from "supertest";
 import {prisma} from "../../src/database";
-import recommendationFactory, { getIdByName } from "../factories/recommendationFactory";
+import {recommendationValidBody, recommendationInvalidBody, getIdByName } from "../factories/recommendationFactory";
 
 beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE Recommendations`
@@ -9,21 +9,26 @@ beforeEach(async () => {
 
 describe("POST /recommendations", () =>{
     it("should return 201 on valid input", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         const response = await supertest(app).post("/recommendations").send(body);
         
         expect(response.status).toEqual(201);
     });
-    // Dividir em dois testes, um para {typeof name !== string}
-    //e um para {youtubeLink !== link real} 
-    //regex link real => const youtubeLinkRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/;
-    it("should return 422 on invalid input", async () =>{
-        const response = await supertest(app).post("/recommendations").send({});
+    it("should return 422 on invalid name", async () =>{
+        const body = recommendationInvalidBody();
+        const response = await supertest(app).post("/recommendations").send(body);
+
+        expect(response.status).toEqual(422);
+    });
+    it("should return 422 on invalid youtube link", async () =>{
+        const body = recommendationValidBody();
+        body.youtubeLink = "programação é irado 😎";
+        const response = await supertest(app).post("/recommendations").send(body);
 
         expect(response.status).toEqual(422);
     });
     it("should return 409 on name already exist", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         await supertest(app).post("/recommendations").send(body);
         const response = await supertest(app).post("/recommendations").send(body);
         
@@ -33,7 +38,7 @@ describe("POST /recommendations", () =>{
 
 describe("POST /:id/upvote", () => {
     it("should return 200 on success", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         await supertest(app).post("/recommendations").send(body);
         const id = await getIdByName("super vídeo mega ultra maneiro");
         const response = await supertest(app).post(`/recommendations/${id}/upvote`);
@@ -49,7 +54,7 @@ describe("POST /:id/upvote", () => {
 
 describe("POST /:id/downvote", () => {
     it("should return 200 on success", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         await supertest(app).post("/recommendations").send(body);
         const id = await getIdByName("super vídeo mega ultra maneiro");
         const response = await supertest(app).post(`/recommendations/${id}/downvote`);
@@ -73,7 +78,7 @@ describe("GET /recommendations", () => {
 
 describe("GET /recommendations/random", () => {
     it("should return 200 on success", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         await supertest(app).post("/recommendations").send(body);
         const response = await supertest(app).get("/recommendations/random");
 
@@ -97,7 +102,7 @@ describe("GET /recommendations/top/:amount", () => {
 
 describe("GET /recommendations/:id", () => {
     it("should return 200 on success", async () => {
-        const body = recommendationFactory();
+        const body = recommendationValidBody();
         await supertest(app).post("/recommendations").send(body);
         const id = await getIdByName("super vídeo mega ultra maneiro");
         const response = await supertest(app).get(`/recommendations/${id}`);
