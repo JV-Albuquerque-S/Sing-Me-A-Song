@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "test:int": "dotenv -e .env.test prisma migrate dev && jest -i"
+    "test:int": "dotenv -e .env.test prisma migrate dev && jest -i --coverage --testPathPattern=tests/integration",
+    "test:unit-no-prisma": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit",
+    "test:unit": "dotenv -e .env.test prisma migrate dev && jest -i --coverage --testPathPattern=tests/unit"
   },
   "keywords": [],
   "author": "",
