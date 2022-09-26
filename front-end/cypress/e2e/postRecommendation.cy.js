@@ -22,7 +22,7 @@ describe('Post recommendation tests', () => {
 
     cy.wait('@recommendations');
 
-    cy.contains('Recommendation name').should('be.visible');
+    cy.contains(body.name).should('be.visible');
   });
 
   it('Post a repeated recommendation', () => {
