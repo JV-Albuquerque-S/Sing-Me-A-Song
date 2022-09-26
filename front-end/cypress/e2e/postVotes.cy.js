@@ -43,7 +43,7 @@ describe('Upvote recommendation tests', () => {
 
     cy.contains(body.name).should('be.visible');
 
-    cy.get("#root article:last div:last svg:last").click();
+    cy.get('#root article:last div:last svg:last').click();
     cy.get('#root article:first div:last').should('have.text', '-1');
   });
 
